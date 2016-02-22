@@ -7,5 +7,5 @@ job = new CronJob(
 	},
 	null,
 	true,
-	'America/Los_Angeles'
+	'Asia/Tokyo'
 );
