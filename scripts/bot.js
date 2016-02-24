@@ -1,41 +1,31 @@
+var Botkit = require('botkit');
+var os = require('os');
+var fetch = require('node-fetch');
+
 if (!process.env.token) {
     console.log('Error: Specify token in environment');
     process.exit(1);
 }
 
-var Botkit = require('botkit');
-var os = require('os');
-
 var controller = Botkit.slackbot({
-    debug: true,
+    debug: false,
 });
 
 var bot = controller.spawn({
     token: process.env.token
 }).startRTM();
 
-
-controller.hears(['pizzatime'],['ambient'],function(bot,message) {
-  bot.startConversation(message, askFlavor);
+controller.hears(['image'], ['ambient'], function(bot, message) {
+	var key = '';
+	var cx = '';
+	var url = 'https://www.googleapis.com/customsearch/v1?key='+key+'&cx='+cx+'&searchType=image&q='+encodeURIComponent('高槻やよい');
+	fetch(url).then(function(response) {
+		return response.json();
+	}).then(function(json) {
+		console.log(json.items);
+		console.log(json.items.length);
+		var link = json.items[0].link;
+		console.log(link);
+		bot.reply(message, link);
+	});
 });
-
-askFlavor = function(response, convo) {
-  convo.ask('What flavor of pizza do you want?', function(response, convo) {
-    convo.say('Awesome.');
-    askSize(response, convo);
-    convo.next();
-  });
-}
-askSize = function(response, convo) {
-  convo.ask('What size do you want?', function(response, convo) {
-    convo.say('Ok.')
-    askWhereDeliver(response, convo);
-    convo.next();
-  });
-}
-askWhereDeliver = function(response, convo) {
-  convo.ask('So where do you want it delivered?', function(response, convo) {
-    convo.say('Ok! Good by.');
-    convo.next();
-  });
-}
